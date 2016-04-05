@@ -1,61 +1,49 @@
 #!/bin/bash
 ##
 ##FUNCTIONS
-##
-method_type()
-{
-	
-}
+createInstance {
+        aws ec2 create-key-pair  --key-name awskey --query 'KeyMaterial' --output text > awskey.pem
+        chmod 400 awskey.pem
+        aws ec2 run-instances --image-id ami-fce3c696 --count 1 --instance-type t2.micro --key-name awskey --region us-east-1 --output text>instanceID.txt
+        instance_id=$(grep INSTANCES instanceID.txt | cut -d $'\t' -f 8)
+        dns_name=$(aws ec2 describe-instances --instance-id $instance_id | grep PublicDnsName | cut -d "\"" -f 4 | sort -u)
 
-##
+}
+createVolume() {
+
+}
+mtype m {
+        createInstance()
+        if [ $volumeFlag == 0 ];then
+             createVolume
+        else
+                checkVolume
+        fi
+}
+volumeid v {
+
+}
+#
 ##
 ## Main
 ##
 ##
+volumeFlag = 0
+
 while getopts ":h:m:v" o; do
     case "${o}" in
         m)
-            s=${OPTARG}
-            
+            m=${OPTARG}
+                mtype m
             ;;
         v)
-            p=${OPTARG}
+            v=${OPTARG}
+                volumeid v
             ;;
         h)
             echo "Usage: $0 [-m type of backup] [-v volume-id ]"
             ;;
-    esac
-done
-shift $((OPTIND-1))
-
-if [ -z "${s}" ] || [ -z "${p}" ]; then
+    esac done 
+    if shift $((OPTIND-1)) if [ -z "${s}" ] || [ -z "${p}" ]; then
     usage
-fi
 
-##
-##
-  option=$1
-  inet_string=""
-  usage=$0"-h|-m|-v"
-  case "$option" in
-
-      "-h")
-	  helptext
-	  ;;
-
-      "-m")
-          method_type    #call method function
-	  ;;
-
-      "-v")
-	  volume_id  #call volumeID function
-	  ;;
-      *)
-        echo " The parameter passed is invalid" $usage
-        
-	;;
-  esac
-
-###end of case statement
-
-exit
