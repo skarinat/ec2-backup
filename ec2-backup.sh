@@ -10,14 +10,20 @@ createInstance {
 
 }
 createVolume() {
+        CHECK=$(du -ms ./skarinat | cut -f1)
+        if [$CHECK<1000]; then
+                SIZE=1
+        else
+                SIZE=2*($CHECK%1000)
+        fi
 
 }
 mtype m {
         createInstance()
         if [ $volumeFlag == 0 ];then
-             createVolume
+             createVolume()
         else
-                checkVolume
+                checkVolume()
         fi
 }
 volumeid v {
@@ -27,23 +33,23 @@ volumeid v {
 ##
 ## Main
 ##
-##
 volumeFlag = 0
-
-while getopts ":h:m:v" o; do
+SIZE=1
+while getopts ":h:m:v:" o; do
     case "${o}" in
         m)
             m=${OPTARG}
-                mtype m
+            dir=$3
+                echo "$m"
+                echo "$dir"
             ;;
         v)
             v=${OPTARG}
-                volumeid v
-            ;;
+         dir=$3
+                echo "$v"
+                echo "$dir"
+          ;;
         h)
             echo "Usage: $0 [-m type of backup] [-v volume-id ]"
             ;;
-    esac done 
-    if shift $((OPTIND-1)) if [ -z "${s}" ] || [ -z "${p}" ]; then
-    usage
-
+    esac done
